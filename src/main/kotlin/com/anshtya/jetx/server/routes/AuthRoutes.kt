@@ -13,7 +13,7 @@ fun Route.authRoute(authController: AuthController) {
         post("/login") {
             val authRequest = call.receive<AuthRequest>()
             val authResult = authController.login(
-                email = authRequest.email,
+                username = authRequest.username,
                 password = authRequest.password
             )
             respond(authResult)
@@ -21,7 +21,7 @@ fun Route.authRoute(authController: AuthController) {
         post("/signup") {
             val authRequest = call.receive<AuthRequest>()
             val authResult = authController.signUp(
-                email = authRequest.email,
+                username = authRequest.username,
                 password = authRequest.password
             )
             respond(authResult)

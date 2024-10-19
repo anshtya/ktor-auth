@@ -20,9 +20,9 @@ fun Application.configureRouting(
             call.respondText("Hello World!")
         }
 
-        get("/user/{email}") {
-            val email = call.parameters["email"]
-            val user = userRepository.getUser(email!!)
+        get("/user/{username}") {
+            val username = call.parameters["username"]
+            val user = userRepository.getUser(username!!)
 
             call.respond(mapOf("user" to user))
         }

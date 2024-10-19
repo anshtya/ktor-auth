@@ -35,7 +35,7 @@ class JwtService(
         return JWT.create()
             .withAudience(audience)
             .withIssuer(issuer)
-            .withClaim("email", claim)
+            .withClaim("username", claim)
             .withExpiresAt(Date(System.currentTimeMillis() + 3_600_000))
             .sign(Algorithm.RSA256(publicKey as RSAPublicKey, privateKey as RSAPrivateKey))
     }
