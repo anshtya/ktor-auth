@@ -17,6 +17,6 @@ fun Application.module() {
     val userRepository = UserRepository()
 
     configureSerialization()
+    configureAuthentication(jwtService, userRepository)
     configureRouting(jwtService, userRepository)
-    configureAuthentication(jwtService)
 }

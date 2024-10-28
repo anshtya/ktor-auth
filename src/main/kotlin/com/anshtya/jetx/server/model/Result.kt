@@ -5,9 +5,9 @@ import com.anshtya.jetx.server.util.statusCode
 import io.ktor.http.HttpStatusCode
 
 sealed interface Result<out T> {
-    data class Success<T>(val message: Map<String, T>) : Result<T> {
+    data class Success<T>(val message: T) : Result<T> {
         companion object {
-            fun <T> toMessage(key: String, data: T) = Success(mapOf(key to data))
+            fun <T> from(data: T) = Success(data)
         }
     }
 
@@ -16,7 +16,7 @@ sealed interface Result<out T> {
         val errorMessage: String?
     ) : Result<Nothing> {
         companion object {
-            fun toResult(e: Exception): Error {
+            fun from(e: Exception): Error {
                 val statusCode = e.statusCode()
                 val errorMessage = statusCode.errorMessage(e)
                 return Error(

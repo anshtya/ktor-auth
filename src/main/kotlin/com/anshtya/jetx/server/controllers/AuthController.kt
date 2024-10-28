@@ -1,5 +1,6 @@
 package com.anshtya.jetx.server.controllers
 
+import com.anshtya.jetx.server.model.AuthResponse
 import com.anshtya.jetx.server.model.Result
 import com.anshtya.jetx.server.model.User
 import com.anshtya.jetx.server.repository.UserRepository
@@ -14,9 +15,9 @@ class AuthController(
     private val jwtService: JwtService,
     private val userRepository: UserRepository
 ) {
-    fun login(username: String, password: String): Result<String> =
+    fun login(username: String, password: String): Result<AuthResponse> =
         try {
-            validateCredentials(username = username, password = password)
+            validateAuthCredentials(username = username, password = password)
             val foundUser = userRepository.getUser(username)
 
             if (foundUser == null) {
@@ -31,16 +32,16 @@ class AuthController(
                 )
             }
 
-            val token = jwtService.generateJwtToken(claim = username)
+            val authResponse = jwtService.authenticate(username = username)
 
-            Result.Success.toMessage(key = "token", data = token)
+            Result.Success.from(authResponse)
         } catch (e: Exception) {
-            Result.Error.toResult(e)
+            Result.Error.from(e)
         }
 
-    fun signUp(username: String, password: String): Result<String> =
+    fun signUp(username: String, password: String): Result<AuthResponse> =
         try {
-            validateCredentials(username = username, password = password)
+            validateAuthCredentials(username = username, password = password)
 
             if (userRepository.getUser(username) != null) {
                 throw AlreadyExistsException(
@@ -52,14 +53,26 @@ class AuthController(
                 User(username = username, password = password)
             )
 
-            val token = jwtService.generateJwtToken(claim = username)
+            val authResponse = jwtService.authenticate(username = username)
 
-            Result.Success.toMessage(key = "token", data = token)
+            Result.Success.from(authResponse)
         } catch (e: Exception) {
-            Result.Error.toResult(e)
+            Result.Error.from(e)
         }
 
-    private fun validateCredentials(username: String, password: String) {
+    fun refresh(token: String): Result<AuthResponse> {
+        return try {
+            val username = jwtService.jwtVerifier
+                .verify(token.substringAfterLast("Bearer "))
+                .claims["username"]!!.asString()
+
+            Result.Success.from(jwtService.authenticate(username))
+        } catch (e: Exception) {
+            Result.Error.from(e)
+        }
+    }
+
+    private fun validateAuthCredentials(username: String, password: String) {
         val message = if (username.isBlank() || password.isBlank()) {
             "Username or password should not be blank."
         } else if (password.length !in (8..50)) {
