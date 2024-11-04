@@ -1,6 +1,6 @@
-package com.example
+package com.anshtya.jetx.server
 
-import com.example.plugins.*
+import com.anshtya.jetx.server.plugins.configureRouting
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
